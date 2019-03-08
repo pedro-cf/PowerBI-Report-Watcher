@@ -68,7 +68,7 @@ function ShowFailedRefreshes {
 						$refreshDate = ([DateTime]::Parse($refresh.endTime))
 						$startDate = ([DateTime]::Today).AddYears($ignoreDays)
 
-						if ($status -eq "Failed" -and $refreshDate -ge $startDate) {
+						if ($status -ne "Completed" -and $refreshDate -ge $startDate) {
 							$fails = $fails + 1
 							if ($printWorkspace -eq 1) {
 								Write-Host "Workspace: $($group.name) (ID: $($group.id))"
@@ -134,7 +134,7 @@ function ShowAllReports {
 
 					if ($refresh.refreshType -eq "Scheduled") {
 						$status = $refresh.status
-						if ($status -eq "Failed") {
+						if ($status -ne "Completed") {
 							Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Red -BackgroundColor Black
 							Write-Host "`t`tLast Refresh Status: $($refresh.status)" -ForegroundColor Red -BackgroundColor Black
 						} else {
