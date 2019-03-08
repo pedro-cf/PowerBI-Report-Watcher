@@ -1,6 +1,6 @@
 ########## Edit Globals here ##########
 $ignoreDays = 15
-$ErrorActionPreference= 'silentlycontinue'
+#$ErrorActionPreference= 'silentlycontinue'
 $progressPreference = 'silentlyContinue' 
 #######################################
 
@@ -63,25 +63,33 @@ function ShowFailedRefreshes {
 				Try { $refresh = (Invoke-WebRequest -Uri $refresh_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json).value[0] } Catch {}
 
 				if ($refresh) {
-					if ($refresh.refreshType -eq "Scheduled") {
-						$status = $refresh.status
+					$status = $refresh.status
+					$refreshDate = ([DateTime]::Today)
+					if ($refresh.endTime) {
 						$refreshDate = ([DateTime]::Parse($refresh.endTime))
-						$startDate = ([DateTime]::Today).AddYears($ignoreDays)
+					}
+					$startDate = ([DateTime]::Today).AddDays(-$ignoreDays)
 
-						if ($status -ne "Completed" -and $refreshDate -ge $startDate) {
-							$fails = $fails + 1
-							if ($printWorkspace -eq 1) {
-								Write-Host "Workspace: $($group.name) (ID: $($group.id))"
-								$printWorkspace = 0
-							}
-							
-							Write-Host "`t$($report.name)"
-							Write-Host "`t`tReport ID: $($report.id)"
-							Write-Host "`t`tDataset ID: $($report.datasetId)"
+					
+					if ($status -ne "Completed" -and $refreshDate -ge $startDate) {
+						$fails = $fails + 1
+						if ($printWorkspace -eq 1) {
+							Write-Host "Workspace: $($group.name) (ID: $($group.id))"
+							$printWorkspace = 0
+						}
+						
+						Write-Host "`t$($report.name)"
+						Write-Host "`t`tReport ID: $($report.id)"
+						Write-Host "`t`tDataset ID: $($report.datasetId)"
+						if ($status = "Failed") {
 							Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Red -BackgroundColor Black
 							Write-Host "`t`tLast Refresh Status: $($status)" -ForegroundColor Red -BackgroundColor Black
-							Write-Host ""
+						} else {
+							Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Yellow -BackgroundColor Black
+							Write-Host "`t`tLast Refresh Status: $($status)" -ForegroundColor Yellow -BackgroundColor Black
 						}
+						
+						Write-Host ""
 					}
 				}
 			}
@@ -130,17 +138,20 @@ function ShowAllReports {
 				Write-Host "`t`tDataset ID: $($report.datasetId)"
 				
 				if ($refresh) {
-					$refreshDate = ([DateTime]::Parse($refresh.endTime))
+					$refreshDate = ""
+					if ($refresh.endTime) {
+						$refreshDate = ([DateTime]::Parse($refresh.endTime))
+					}
 
-					if ($refresh.refreshType -eq "Scheduled") {
-						$status = $refresh.status
-						if ($status -ne "Completed") {
-							Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Red -BackgroundColor Black
-							Write-Host "`t`tLast Refresh Status: $($refresh.status)" -ForegroundColor Red -BackgroundColor Black
-						} else {
-							Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Green -BackgroundColor Black
-							Write-Host "`t`tLast Refresh Status: $($refresh.status)" -ForegroundColor Green -BackgroundColor Black
-						}
+					$status = $refresh.status
+					if ($status -eq "Failed") {
+						Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Red -BackgroundColor Black
+						Write-Host "`t`tLast Refresh Status: $($refresh.status)" -ForegroundColor Red -BackgroundColor Black
+					} elseif ($status -eq "Completed") {
+						Write-Host "`t`tLast Refresh Date: $($refreshDate)" -ForegroundColor Green -BackgroundColor Black
+						Write-Host "`t`tLast Refresh Status: $($refresh.status)" -ForegroundColor Green -BackgroundColor Black
+					} else {
+						Write-Host "`t`tLast Refresh Status: $($refresh.status)" -ForegroundColor Yellow -BackgroundColor Black
 					}
 				}
 				
