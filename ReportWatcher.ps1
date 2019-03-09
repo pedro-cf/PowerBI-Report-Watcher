@@ -1,8 +1,8 @@
-########## Edit Globals here ##########
+############# Edit Globals here #############
 $ignoreDays = 15
 #$ErrorActionPreference= 'silentlycontinue'
 $progressPreference = 'silentlyContinue' 
-#######################################
+#############################################
 
 if (!(Get-Module -ListAvailable -Name MicrosoftPowerBIMgmt.Profile)) {
 	Write-Host "RequiYellow module MicrosoftPowerBIMgmt.Profile not found. InstNoneing..."
@@ -12,12 +12,9 @@ if (!(Get-Module -ListAvailable -Name MicrosoftPowerBIMgmt.Profile)) {
 }
 
 Write-Host "Connecting to Power BI Service..."
-#Connect-PowerBIServiceAccount
+Connect-PowerBIServiceAccount
 
-#$access_token = Get-PowerBIAccessToken -AsString
-
-$access_token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik4tbEMwbi05REFMcXdodUhZbkhRNjNHZUNYYyIsImtpZCI6Ik4tbEMwbi05REFMcXdodUhZbkhRNjNHZUNYYyJ9.eyJhdWQiOiJodHRwczovL2FuYWx5c2lzLndpbmRvd3MubmV0L3Bvd2VyYmkvYXBpIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvN2U1ZjllMGUtNzllNi00NDI3LTg2MjctYmE5YTVmN2NiNTFmLyIsImlhdCI6MTU1MjE0NjYzNCwibmJmIjoxNTUyMTQ2NjM0LCJleHAiOjE1NTIxNTA1MzQsImFjY3QiOjAsImFjciI6IjEiLCJhaW8iOiJBVlFBcS84S0FBQUFOOTllSGMrY0hOc2xRc01WS2FpOUN5amtCbWFVYTAwcU5QM25sOUtheW8zZkNrN3g3UDZSd3dRWk1rSERCdEs0N0JoSTlNQTk1UUU4eE53WE9ZNWhBcC81RzRCMXJrNUFXK01EMGtKZTRwND0iLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcGlkIjoiZWEwNjE2YmEtNjM4Yi00ZGY1LTk1YjktNjM2NjU5YWU1MTIxIiwiYXBwaWRhY3IiOiIwIiwiZmFtaWx5X25hbWUiOiJGZXJuYW5kZXMiLCJnaXZlbl9uYW1lIjoiUGVkcm8iLCJpcGFkZHIiOiIyMTMuMjIuMjQwLjExNyIsIm5hbWUiOiJQZWRybyBGZXJuYW5kZXMiLCJvaWQiOiI4ZjY5Zjk2NC0zOTcwLTQ4ZmUtYWQ4NS1iMzFlMDBmMWUzZmIiLCJwdWlkIjoiMTAwMzIwMDAzODE3Q0IzMCIsInNjcCI6InVzZXJfaW1wZXJzb25hdGlvbiIsInN1YiI6IkQ3VlMtLVJxN2RwU2xnNGt4Y1NvUGtTOFBFb05lZ25kbFZXMFoxQno5TWciLCJ0aWQiOiI3ZTVmOWUwZS03OWU2LTQ0MjctODYyNy1iYTlhNWY3Y2I1MWYiLCJ1bmlxdWVfbmFtZSI6InBlZHJvLmZlcm5hbmRlc0Bpbm92cmV0YWlsLmNvbSIsInVwbiI6InBlZHJvLmZlcm5hbmRlc0Bpbm92cmV0YWlsLmNvbSIsInV0aSI6IjhmX0ZrcWtDQ0VTRkJvMW1mSHc4QUEiLCJ2ZXIiOiIxLjAifQ.dF-c3TuPbnydJ_-l0_jzOM4NQJH1u2l8Hnrlf8CbfUjFa2FS7AynEchw1TUpbHdDlRQguMH3dOWlkPZAPlTmikmdfJxKuitdgcWVcEzbcq14-M79G_OGCDZusfb2H4DQu-quRFcHxUmSmE6UDIiMWfoc1eu9wc9lJZZYUIStQ6SvTaXb1lHFBro5C48YDfuqHfJ0u2xqKsU9fhspqE9JMkOvsu8oCHiVaXeTWenNuHlg8tRzhlVJiX6AxFHfQywtBuWh_Ua2YzZli2GYNIRE5Tzf8L7tPJvSXxst9Ps9DOsTao2c2ntqhgv_iBTzZDlmpl-nIcH6xUycbxi44qWCxA"
-
+$access_token = Get-PowerBIAccessToken -AsString
 
 if (!$access_token) {
 	Write-Host -NoNewLine 'Unable to get access token...'; 
