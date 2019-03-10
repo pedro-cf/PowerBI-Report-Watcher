@@ -5,16 +5,17 @@ $progressPreference = 'silentlyContinue'
 #############################################
 
 if (!(Get-Module -ListAvailable -Name MicrosoftPowerBIMgmt.Profile)) {
-	Write-Host "RequiYellow module MicrosoftPowerBIMgmt.Profile not found. InstNoneing..."
+	Write-Host "RequiDarkRed module MicrosoftPowerBIMgmt.Profile not found. InstNoneing..."
 	if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
 	InstNone-Module -Name MicrosoftPowerBIMgmt.Profile
 	Clear-Host
 }
 
 Write-Host "Connecting to Power BI Service..."
-Connect-PowerBIServiceAccount
+#Connect-PowerBIServiceAccount
+#$access_token = Get-PowerBIAccessToken -AsString
+$access_token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik4tbEMwbi05REFMcXdodUhZbkhRNjNHZUNYYyIsImtpZCI6Ik4tbEMwbi05REFMcXdodUhZbkhRNjNHZUNYYyJ9.eyJhdWQiOiJodHRwczovL2FuYWx5c2lzLndpbmRvd3MubmV0L3Bvd2VyYmkvYXBpIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvN2U1ZjllMGUtNzllNi00NDI3LTg2MjctYmE5YTVmN2NiNTFmLyIsImlhdCI6MTU1MjIzNTE1OCwibmJmIjoxNTUyMjM1MTU4LCJleHAiOjE1NTIyMzkwNTgsImFjY3QiOjAsImFjciI6IjEiLCJhaW8iOiJBVlFBcS84S0FBQUFzcDFyUmxMcmtPMXZqMTlaWldETDRZRG10anNlZWtLOTVyaEJzbHpVU1FqZlJITWd0WktQTmNYT0paTUthYm1YM1hNRytoeDdHeHRTYW16RkNBY0VKWEx0ZGwwR0ZQQjRubmlhV0UweXFZND0iLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcGlkIjoiZWEwNjE2YmEtNjM4Yi00ZGY1LTk1YjktNjM2NjU5YWU1MTIxIiwiYXBwaWRhY3IiOiIwIiwiZmFtaWx5X25hbWUiOiJGZXJuYW5kZXMiLCJnaXZlbl9uYW1lIjoiUGVkcm8iLCJpcGFkZHIiOiIyMTMuMjIuMjQwLjExNyIsIm5hbWUiOiJQZWRybyBGZXJuYW5kZXMiLCJvaWQiOiI4ZjY5Zjk2NC0zOTcwLTQ4ZmUtYWQ4NS1iMzFlMDBmMWUzZmIiLCJwdWlkIjoiMTAwMzIwMDAzODE3Q0IzMCIsInNjcCI6InVzZXJfaW1wZXJzb25hdGlvbiIsInN1YiI6IkQ3VlMtLVJxN2RwU2xnNGt4Y1NvUGtTOFBFb05lZ25kbFZXMFoxQno5TWciLCJ0aWQiOiI3ZTVmOWUwZS03OWU2LTQ0MjctODYyNy1iYTlhNWY3Y2I1MWYiLCJ1bmlxdWVfbmFtZSI6InBlZHJvLmZlcm5hbmRlc0Bpbm92cmV0YWlsLmNvbSIsInVwbiI6InBlZHJvLmZlcm5hbmRlc0Bpbm92cmV0YWlsLmNvbSIsInV0aSI6Im5fV2d1aXpaYWtpVUtweEVhM2hWQUEiLCJ2ZXIiOiIxLjAifQ.bIwE-U1apXG_9_WOi7QnxM9XxikX7qAmElQU0UbMa7dkG24HK3PdnHhFcbqDxODI9vseeaEclMOHQNAcXVd1EAQkzHB7E9S9x0Z-JzDQK1glDslfh6jKQdb3G9PhUi80UoJGBU244Xkkn04LIWJ_IyCuevWgufp0SbP3445ZZOkS9lazmh7u77YC35FKFFZ5oHS2R6OVoNQ3XcGmYU3Vlkk49ofiVfaERws2QoKYueqNn4vsT8mAZkeJNOUU8ut3Jl0ePQQBZIPL583xPw6XP919_CwP6UqUQeerDmrbsKtbkfpfIaY8LbyKkyet_kh0TVAAGQzg6fhUlyeNmsAU2g"
 
-$access_token = Get-PowerBIAccessToken -AsString
 
 if (!$access_token) {
 	Write-Host -NoNewLine 'Unable to get access token...'; 
@@ -33,9 +34,9 @@ $groups = (Invoke-WebRequest -Uri $groups_uri -UseBasicParsing -Headers $auth_he
 function ShowFailedRefreshes {
 	
 
-	$groupFilter = Read-Host "Group Filter [Default: None]"
+	$groupFilter = Read-Host "Group Filter"
 	Write-Host ""
-	$reportFilter = Read-Host "Report Filter [Default: None]"
+	$reportFilter = Read-Host "Report Filter"
 	Write-Host ""
 	Write-Host "Ignoring failed refreshes over $($ignoreDays) days ago."
 	Write-Host ""
@@ -82,9 +83,31 @@ function ShowFailedRefreshes {
 						Write-Host "`t`tReport ID: $($report.id)"
 						Write-Host "`t`tDataset ID: $($report.datasetId)"
 						if ($status = "Failed") {
-							Write-Host "`t`tLast Refresh:  Type:$($type), Status:$($status), Date: $($refreshDate)" -ForegroundColor Red -BackgroundColor Black
+							Write-Host "`t`tLast Refresh:  Type: $($type), Status: $($status), Date: $($refreshDate)" -ForegroundColor White -BackgroundColor DarkRed
+							
+							$error_json = $refresh.serviceExceptionJson | ConvertFrom-Json | ConvertTo-Json -depth 100 | ConvertFrom-Json
+							$cnt = 0
+							foreach($pe in $error_json.error."pbi.error"."parameters") {
+								if ($cnt -eq 0) { Write-Host "`t`t   *Table errors: " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+								if ($cnt++ -gt 0) { 	Write-Host " | " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+								Write-Host "[$($pe.Value)]" -NoNewline -ForegroundColor Black -BackgroundColor DarkRed
+							}
+							if ($cnt -gt 0) { Write-Host ""}
+							$cnt = 0
+							$error_details = ""
+							foreach($de in $error_json.error."pbi.error"."details") {
+								if ($de.detail.value.Length -gt 2) {
+									if ($cnt++ -gt 0) { $error_details = "$($error_details)  | " }
+									$error_details = "$($error_details) $($de.detail.value) "
+								}
+							}
+							if ($cnt -gt 0) {
+								$error_details = $error_details.replace("`n","").replace("`r","")
+								Write-Host "`t`t   *Error details: $($error_details)" -ForegroundColor Black -BackgroundColor DarkRed
+							}
+
 						} else {
-							Write-Host "`t`tLast Refresh: Type:$($type), Status:$($status), Date: $($refreshDate)" -ForegroundColor Yellow -BackgroundColor Black
+							Write-Host "`t`tLast Refresh: Type: $($type), Status: $($status), Date: $($refreshDate)" -ForegroundColor White -BackgroundColor DarkRed
 						}
 						
 						Write-Host ""
@@ -94,6 +117,7 @@ function ShowFailedRefreshes {
 			
 		}
 	}
+	Write-Host ""
 	Write-Host "$($fails) failed refreshes in the past $($ignoreDays) days."
 	Write-Host ""
 }
@@ -106,9 +130,9 @@ function ExportFailedRefreshes {
 }
 
 function ShowAllReports {
-	$groupFilter = Read-Host "Group Filter [Default: None]"
+	$groupFilter = Read-Host "Group Filter"
 	Write-Host ""
-	$reportFilter = Read-Host "Report Filter [Default: None]"
+	$reportFilter = Read-Host "Report Filter"
 	Write-Host ""
 	Write-Host "Scanning..."
 	Write-Host ""
@@ -152,11 +176,33 @@ function ShowAllReports {
 						$status = $cur_refresh.status
 						$type = $cur_refresh.refreshType
 						if ($status -eq "Failed") {
-							Write-Host "`t`t$($num). Type:$($type), Status:$($status), Date: $($refreshDate)" -ForegroundColor Red -BackgroundColor Black
+							Write-Host "`t`t$($num). Type: $($type), Status: $($status), Date: $($refreshDate)" -ForegroundColor White -BackgroundColor DarkRed
+
+							$error_json = $cur_refresh.serviceExceptionJson | ConvertFrom-Json | ConvertTo-Json -depth 100 | ConvertFrom-Json
+							$cnt = 0
+							foreach($pe in $error_json.error."pbi.error"."parameters") {
+								if ($cnt -eq 0) { Write-Host "`t`t   *Table errors: " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+								if ($cnt++ -gt 0) { 	Write-Host " | " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+								Write-Host "[$($pe.Value)]" -NoNewline -ForegroundColor Black -BackgroundColor DarkRed
+							}
+							if ($cnt -gt 0) { Write-Host ""}
+							$cnt = 0
+							$error_details = ""
+							foreach($de in $error_json.error."pbi.error"."details") {
+								if ($de.detail.value.Length -gt 2) {
+									if ($cnt++ -gt 0) { $error_details = "$($error_details)  | " }
+									$error_details = "$($error_details) $($de.detail.value) "
+								}
+							}
+							if ($cnt -gt 0) {
+								$error_details = $error_details.replace("`n","").replace("`r","")
+								Write-Host "`t`t   *Error details: $($error_details)" -ForegroundColor Black -BackgroundColor DarkRed
+							}
+
 						} elseif ($status -eq "Completed") {
-							Write-Host "`t`t$($num). Type:$($type), Status:$($status), Date: $($refreshDate)"  -ForegroundColor Green -BackgroundColor Black
+							Write-Host "`t`t$($num). Type: $($type), Status: $($status), Date: $($refreshDate)"  -ForegroundColor White -BackgroundColor DarkGreen
 						} else {
-							Write-Host "`t`t$($num). Type:$($type), Status:$($status)" -ForegroundColor Yellow -BackgroundColor Black
+							Write-Host "`t`t$($num). Type: $($type), Status: $($status)" -ForegroundColor White -BackgroundColor DarkRed
 						}
 					}
 
