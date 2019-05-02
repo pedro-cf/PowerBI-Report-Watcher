@@ -39,7 +39,7 @@ function ShowFailedRefreshes {
 	Write-Host ""
 	Write-Host "Ignoring failed refreshes over $($ignoreDays) days ago."
 	Write-Host ""
-	Write-Host "Scanning..."
+	Write-Host "Printing failed refreshes..."
 	Write-Host ""
 
 	$fails = 0
@@ -133,7 +133,7 @@ function ShowAllReports {
 	Write-Host ""
 	$reportFilter = Read-Host "Report Filter"
 	Write-Host ""
-	Write-Host "Scanning..."
+	Write-Host "Printing reports..."
 	Write-Host ""
 
 	foreach($group in $groups)
@@ -215,10 +215,58 @@ function ShowAllReports {
 	}
 }
 
-function ExportNoneReports {
+function ExportAllReports {
 	Clear-Content -Path .\reportlog.txt
 	Start-Transcript -Path .\reportlog.txt
 	ShowAllReports
+	Stop-Transcript
+}
+
+function ShowAllScheduledRefreshes {
+	$groupFilter = Read-Host "Group Filter"
+	Write-Host ""
+	$reportFilter = Read-Host "Report Filter"
+	Write-Host ""
+	Write-Host "Printing Scheduled Refreshes..."
+	Write-Host ""
+
+	foreach($group in $groups)
+	{	
+		if ( ($groupFilter -ne "") -and -not( ($group.name).ToLower().contains($groupFilter.ToLower()))) { continue }
+
+		$group_reports_uri = "$($groups_uri)/$($group.id)/reports"
+		$reports = (Invoke-WebRequest -Uri $group_reports_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json).value
+		if ($reports.Length -eq 0) {
+
+		} else {
+			
+			foreach ($report in $reports)
+			{
+				if ( ($reportFilter -ne "") -and -not( ($report.name).ToLower().contains($reportFilter.ToLower()))) { continue }
+				
+				$scheduled_refresh_uri = "https://api.powerbi.com/v1.0/myorg/groups/$($group.id)/datasets/$($report.datasetId)/refreshSchedule"
+				Try { $scheduled_refresh = (Invoke-WebRequest -Uri $scheduled_refresh_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json) } Catch {}
+		
+				if ($scheduled_refresh) {
+					if ($scheduled_refresh.enabled -eq "True") {
+						Write-Host "`t$($group.name) > $($report.name)"
+						if ($scheduled_refresh.times)  {
+							Write-Host "`t`t$($scheduled_refresh.times)"
+						} else {
+							Write-Host "`t`t00:00"
+						}
+						Write-Host ""
+					}
+				}
+			}
+		}
+	}
+}
+
+function ExportAllScheduledRefreshes {
+	Clear-Content -Path .\scheduledRefreshLog.txt
+	Start-Transcript -Path .\scheduledRefreshLog.txt
+	ShowAllScheduledRefreshes
 	Stop-Transcript
 }
 
@@ -239,7 +287,11 @@ function PrintMenu
 	Write-Host ""
 	Write-Host "4. Export All Reports."
 	Write-Host ""
-	Write-Host "5. Exit."
+	Write-Host "5. Show All Scheduled Refreshes."
+	Write-Host ""
+	Write-Host "6. Export All Scheduled Refreshes"
+	Write-Host ""
+	Write-Host "7. Exit"
 	Write-Host ""
 }
 
@@ -260,13 +312,19 @@ do
 				ExportFailedRefreshes
 		} '4' {
 				PrintTitle
-				ExportNoneReports
+				ExportAllReports
 		} '5' {
+				PrintTitle
+				ShowAllScheduledRefreshes
+		} '6' {
+				PrintTitle
+				ExportAllScheduledRefreshes
+		} '7' {
 				return
 		}
 	}
 	pause
 }
-until ($input -eq '5')
+until ($input -eq '7')
 
 
