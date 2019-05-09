@@ -84,25 +84,32 @@ function ShowFailedRefreshes {
 						if ($status = "Failed") {
 							Write-Host "`t`tLast Refresh:  Type: $($type), Status: $($status), Date: $($refreshDate)" -ForegroundColor White -BackgroundColor DarkRed
 							
-							$error_json = $refresh.serviceExceptionJson | ConvertFrom-Json | ConvertTo-Json -depth 100 | ConvertFrom-Json
-							$cnt = 0
-							foreach($pe in $error_json.error."pbi.error"."parameters") {
-								if ($cnt -eq 0) { Write-Host "`t`t   *Table errors: " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
-								if ($cnt++ -gt 0) { 	Write-Host " | " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
-								Write-Host "[$($pe.Value)]" -NoNewline -ForegroundColor Black -BackgroundColor DarkRed
-							}
-							if ($cnt -gt 0) { Write-Host ""}
-							$cnt = 0
-							$error_details = ""
-							foreach($de in $error_json.error."pbi.error"."details") {
-								if ($de.detail.value.Length -gt 2) {
-									if ($cnt++ -gt 0) { $error_details = "$($error_details)  | " }
-									$error_details = "$($error_details) $($de.detail.value) "
+							$error_json_ex = $refresh.serviceExceptionJson 
+							
+							if ($error_json_ex) {
+							
+								$error_json = $error_json_ex | ConvertFrom-Json | ConvertTo-Json -depth 100 | ConvertFrom-Json
+								
+								$cnt = 0
+								foreach($pe in $error_json.error."pbi.error"."parameters") {
+									if ($cnt -eq 0) { Write-Host "`t`t   *Table errors: " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+									if ($cnt++ -gt 0) { 	Write-Host " | " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+									Write-Host "[$($pe.Value)]" -NoNewline -ForegroundColor Black -BackgroundColor DarkRed
 								}
-							}
-							if ($cnt -gt 0) {
-								$error_details = $error_details.replace("`n","").replace("`r","")
-								Write-Host "`t`t   *Error details: $($error_details)" -ForegroundColor Black -BackgroundColor DarkRed
+								if ($cnt -gt 0) { Write-Host ""}
+								$cnt = 0
+								$error_details = ""
+								foreach($de in $error_json.error."pbi.error"."details") {
+									if ($de.detail.value.Length -gt 2) {
+										if ($cnt++ -gt 0) { $error_details = "$($error_details)  | " }
+										$error_details = "$($error_details) $($de.detail.value) "
+									}
+								}
+								if ($cnt -gt 0) {
+									$error_details = $error_details.replace("`n","").replace("`r","")
+									Write-Host "`t`t   *Error details: $($error_details)" -ForegroundColor Black -BackgroundColor DarkRed
+								}
+								
 							}
 
 						} else {
@@ -177,25 +184,32 @@ function ShowAllReports {
 						if ($status -eq "Failed") {
 							Write-Host "`t`t$($num). Type: $($type), Status: $($status), Date: $($refreshDate)" -ForegroundColor White -BackgroundColor DarkRed
 
-							$error_json = $cur_refresh.serviceExceptionJson | ConvertFrom-Json | ConvertTo-Json -depth 100 | ConvertFrom-Json
-							$cnt = 0
-							foreach($pe in $error_json.error."pbi.error"."parameters") {
-								if ($cnt -eq 0) { Write-Host "`t`t   *Table errors: " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
-								if ($cnt++ -gt 0) { 	Write-Host " | " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
-								Write-Host "[$($pe.Value)]" -NoNewline -ForegroundColor Black -BackgroundColor DarkRed
-							}
-							if ($cnt -gt 0) { Write-Host ""}
-							$cnt = 0
-							$error_details = ""
-							foreach($de in $error_json.error."pbi.error"."details") {
-								if ($de.detail.value.Length -gt 2) {
-									if ($cnt++ -gt 0) { $error_details = "$($error_details)  | " }
-									$error_details = "$($error_details) $($de.detail.value) "
+							$error_json_ex = $cur_refresh.serviceExceptionJson
+							
+							if ($error_json_ex) {
+							
+								$error_json = $error_json_ex | ConvertFrom-Json | ConvertTo-Json -depth 100 | ConvertFrom-Json
+								
+								
+								$cnt = 0
+								foreach($pe in $error_json.error."pbi.error"."parameters") {
+									if ($cnt -eq 0) { Write-Host "`t`t   *Table errors: " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+									if ($cnt++ -gt 0) { 	Write-Host " | " -NoNewline -ForegroundColor Black -BackgroundColor DarkRed }
+									Write-Host "[$($pe.Value)]" -NoNewline -ForegroundColor Black -BackgroundColor DarkRed
 								}
-							}
-							if ($cnt -gt 0) {
-								$error_details = $error_details.replace("`n","").replace("`r","")
-								Write-Host "`t`t   *Error details: $($error_details)" -ForegroundColor Black -BackgroundColor DarkRed
+								if ($cnt -gt 0) { Write-Host ""}
+								$cnt = 0
+								$error_details = ""
+								foreach($de in $error_json.error."pbi.error"."details") {
+									if ($de.detail.value.Length -gt 2) {
+										if ($cnt++ -gt 0) { $error_details = "$($error_details)  | " }
+										$error_details = "$($error_details) $($de.detail.value) "
+									}
+								}
+								if ($cnt -gt 0) {
+									$error_details = $error_details.replace("`n","").replace("`r","")
+									Write-Host "`t`t   *Error details: $($error_details)" -ForegroundColor Black -BackgroundColor DarkRed
+								}
 							}
 
 						} elseif ($status -eq "Completed") {
