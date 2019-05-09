@@ -230,6 +230,8 @@ function ShowAllScheduledRefreshes {
 	Write-Host "Printing Scheduled Refreshes..."
 	Write-Host ""
 
+	$schedule_list = @()
+
 	foreach($group in $groups)
 	{	
 		if ( ($groupFilter -ne "") -and -not( ($group.name).ToLower().contains($groupFilter.ToLower()))) { continue }
@@ -249,18 +251,84 @@ function ShowAllScheduledRefreshes {
 		
 				if ($scheduled_refresh) {
 					if ($scheduled_refresh.enabled -eq "True") {
-						Write-Host "`t$($group.name) > $($report.name)"
 						if ($scheduled_refresh.times)  {
-							Write-Host "`t`t$($scheduled_refresh.times)"
+							foreach($time in $scheduled_refresh.times) {
+								$schedule_list += "$($time)`t$($group.name) > $($report.name)"
+							}
 						} else {
-							Write-Host "`t`t00:00"
+							$schedule_list += "00:00`t$($group.name) > $($report.name)"
 						}
-						Write-Host ""
 					}
 				}
 			}
 		}
 	}
+
+	$time_segments = @(
+		"00:00",
+		"00:30",
+		"01:00",
+		"01:30",
+		"02:00",
+		"02:30",
+		"03:00",
+		"03:30",
+		"04:00",
+		"04:30",
+		"05:00",
+		"05:30",
+		"06:00",
+		"06:30",
+		"07:00",
+		"07:30",
+		"08:00",
+		"08:30",
+		"09:00",
+		"09:30",
+		"10:00",
+		"10:30",
+		"11:00",
+		"11:30",
+		"12:00",
+		"12:30",
+		"13:00",
+		"13:30",
+		"14:00",
+		"14:30",
+		"15:00",
+		"15:30",
+		"16:00",
+		"16:30",
+		"17:00",
+		"17:30",
+		"18:00",
+		"18:30",
+		"19:00",
+		"19:30",
+		"20:00",
+		"20:30",
+		"21:00",
+		"21:30",
+		"22:00",
+		"22:30",
+		"23:00",
+		"23:30"
+	)
+
+	foreach ($time_segment in $time_segments) {
+		$hasOne = 0
+		foreach($schedule_item in $schedule_list) {
+			if ($schedule_item.StartsWith($time_segment)) {
+				Write-Host $schedule_item
+				$hasOne = 1
+			}
+		}
+		if ($hasOne -eq 0) {
+			Write-Host "$($time_segment)`t---"
+		}
+	}
+
+	Write-Host ""
 }
 
 function ExportAllScheduledRefreshes {
@@ -283,11 +351,11 @@ function PrintMenu
 	Write-Host ""
 	Write-Host "2. Show All Reports"
 	Write-Host ""
-	Write-Host "3. Export Failed Refreshes (Last $($ignoreDays) days)"
+	Write-Host "3. Show All Scheduled Refreshes"
 	Write-Host ""
-	Write-Host "4. Export All Reports."
+	Write-Host "4. Export Failed Refreshes (Last $($ignoreDays) days)"
 	Write-Host ""
-	Write-Host "5. Show All Scheduled Refreshes."
+	Write-Host "5. Export All Reports"
 	Write-Host ""
 	Write-Host "6. Export All Scheduled Refreshes"
 	Write-Host ""
@@ -309,13 +377,14 @@ do
 				ShowAllReports
 		} '3' {
 				PrintTitle
-				ExportFailedRefreshes
+				ShowAllScheduledRefreshes
+				
 		} '4' {
 				PrintTitle
-				ExportAllReports
+				ExportFailedRefreshes
 		} '5' {
 				PrintTitle
-				ShowAllScheduledRefreshes
+				ExportAllReports
 		} '6' {
 				PrintTitle
 				ExportAllScheduledRefreshes
