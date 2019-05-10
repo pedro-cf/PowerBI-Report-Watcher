@@ -67,7 +67,7 @@ function ShowFailedRefreshes {
 					$refreshDate = ([DateTime]::Today)
 					if ($refresh.endTime) {
 						$refreshDate = ([DateTime]::Parse($refresh.endTime))
-					} else if ($refresh.startTime) {
+					} elseif ($refresh.startTime) {
 						$refreshDate = ([DateTime]::Parse($refresh.startTime))
 					}
 					$startDate = ([DateTime]::Today).AddDays(-$ignoreDays)
@@ -178,7 +178,7 @@ function ShowAllReports {
 						$refreshDate = ""
 						if ($cur_refresh.endTime) {
 							$refreshDate = ([DateTime]::Parse($cur_refresh.endTime))
-						} else if ($cur_refresh.startTime) {
+						} elseif ($cur_refresh.startTime) {
 							$refreshDate = ([DateTime]::Parse($cur_refresh.startTime))
 						}
 						
