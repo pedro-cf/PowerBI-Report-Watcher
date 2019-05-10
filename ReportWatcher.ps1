@@ -81,7 +81,7 @@ function ShowFailedRefreshes {
 						Write-Host "`t$($report.name)"
 						Write-Host "`t`tReport ID: $($report.id)"
 						Write-Host "`t`tDataset ID: $($report.datasetId)"
-						if ($status = "Failed") {
+						if ($status -eq "Failed") {
 							Write-Host "`t`tLast Refresh:  Type: $($type), Status: $($status), Date: $($refreshDate)" -ForegroundColor White -BackgroundColor DarkRed
 							
 							$error_json_ex = $refresh.serviceExceptionJson 
