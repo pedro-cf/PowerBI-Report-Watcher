@@ -247,6 +247,8 @@ function ShowAllScheduledRefreshes {
 	Write-Host ""
 	Write-Host "Printing Scheduled Refreshes..."
 	Write-Host ""
+	Write-Host "UTC`tDuration`tDataset"
+	Write-Host "-----`t--------`t-------"
 
 	$schedule_list = @()
 
@@ -266,15 +268,33 @@ function ShowAllScheduledRefreshes {
 				
 				$scheduled_refresh_uri = "https://api.powerbi.com/v1.0/myorg/groups/$($group.id)/datasets/$($report.datasetId)/refreshSchedule"
 				Try { $scheduled_refresh = (Invoke-WebRequest -Uri $scheduled_refresh_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json) } Catch {}
-		
+
+
 				if ($scheduled_refresh) {
 					if ($scheduled_refresh.enabled -eq "True") {
+
+						$refresh_history_uri = "https://api.powerbi.com/v1.0/myorg/groups/$($group.id)/datasets/$($report.datasetId)/refreshes?$top=1"
+						Try { $refresh_history = (Invoke-WebRequest -Uri $refresh_history_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json).value } Catch {}
+
+						$refreshDuration =  "?????????????????"
+						if ($refresh_history) {
+							$refresh_count = $refresh_history.Length
+							if ($refresh_count -gt 0) {
+								$cur_refresh = $refresh_history[0]
+								if ($cur_refresh.endTime -and $cur_refresh.startTime) {
+									$refreshStart = ([DateTime]::Parse($cur_refresh.endTime))
+									$refreshEnd = ([DateTime]::Parse($cur_refresh.startTime))
+									$refreshDuration = ("{0:hh\:mm\:ss}" -f ($refreshStart - $refreshEnd))
+								}
+							}
+						}
+					
 						if ($scheduled_refresh.times)  {
 							foreach($time in $scheduled_refresh.times) {
-								$schedule_list += "$($time)`t$($group.name) > $($report.name)"
+								$schedule_list += "$($time)`t$($refreshDuration)`t$($group.name) > $($report.name)"
 							}
 						} else {
-							$schedule_list += "00:00`t$($group.name) > $($report.name)"
+							$schedule_list += "00:00`t$($refreshDuration)`t$($group.name) > $($report.name)"
 						}
 					}
 				}
