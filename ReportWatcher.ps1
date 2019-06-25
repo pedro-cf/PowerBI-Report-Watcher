@@ -276,7 +276,7 @@ function ShowAllScheduledRefreshes {
 						$refresh_history_uri = "https://api.powerbi.com/v1.0/myorg/groups/$($group.id)/datasets/$($report.datasetId)/refreshes?$top=1"
 						Try { $refresh_history = (Invoke-WebRequest -Uri $refresh_history_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json).value } Catch {}
 
-						$refreshDuration =  "?????????????????"
+						$refreshDuration =  "????????"
 						if ($refresh_history) {
 							$refresh_count = $refresh_history.Length
 							if ($refresh_count -gt 0) {
