@@ -30,15 +30,14 @@ $groups_uri = "https://api.powerbi.com/v1.0/myorg/groups"
 $groups = (Invoke-WebRequest -Uri $groups_uri -UseBasicParsing -Headers $auth_headers | ConvertFrom-Json).value
 
 function ShowFailedRefreshes {
-	
+	Write-Host "Printing failed refreshes..."
+	Write-Host ""
 
 	$groupFilter = Read-Host "Group Filter"
 	Write-Host ""
 	$reportFilter = Read-Host "Report Filter"
 	Write-Host ""
 	Write-Host "Ignoring failed refreshes over $($ignoreDays) days ago."
-	Write-Host ""
-	Write-Host "Printing failed refreshes..."
 	Write-Host ""
 
 	$fails = 0
@@ -137,11 +136,12 @@ function ExportFailedRefreshes {
 }
 
 function ShowAllReports {
+	Write-Host "Printing reports..."
+	Write-Host ""
+
 	$groupFilter = Read-Host "Group Filter"
 	Write-Host ""
 	$reportFilter = Read-Host "Report Filter"
-	Write-Host ""
-	Write-Host "Printing reports..."
 	Write-Host ""
 
 	foreach($group in $groups)
@@ -240,14 +240,16 @@ function ExportAllReports {
 }
 
 function ShowAllScheduledRefreshes {
+	Write-Host "Printing Scheduled Refreshes..."
+	Write-Host ""
+
 	$groupFilter = Read-Host "Group Filter"
 	Write-Host ""
 	$reportFilter = Read-Host "Report Filter"
 	Write-Host ""
-	Write-Host "Printing Scheduled Refreshes..."
-	Write-Host ""
-	Write-Host "UTC`tDuration`tDataset"
-	Write-Host "-----`t--------`t-------"
+	
+	Write-Host " UTC    Duration   Dataset"
+	Write-Host "-----   --------   -------"
 
 	$schedule_list = @()
 
@@ -290,10 +292,10 @@ function ShowAllScheduledRefreshes {
 					
 						if ($scheduled_refresh.times)  {
 							foreach($time in $scheduled_refresh.times) {
-								$schedule_list += "$($time)`t$($refreshDuration)`t$($group.name) > $($report.name)"
+								$schedule_list += "$($time)   $($refreshDuration)   $($group.name) > $($report.name)"
 							}
 						} else {
-							$schedule_list += "00:00`t$($refreshDuration)`t$($group.name) > $($report.name)"
+							$schedule_list += "00:00   $($refreshDuration)   $($group.name) > $($report.name)"
 						}
 					}
 				}
