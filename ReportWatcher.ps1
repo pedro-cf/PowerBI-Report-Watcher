@@ -15,10 +15,11 @@ Write-Host "Connecting to Power BI Service..."
 Connect-PowerBIServiceAccount
 $access_token = Get-PowerBIAccessToken -AsString
 
+(New-Object -ComObject WScript.Shell).AppActivate($pid)
 
 if (!$access_token) {
 	Write-Host -NoNewLine 'Unable to get access token...'; 
-	$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+	$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 	stop-process -Id $PID
 }
 
@@ -387,7 +388,8 @@ do
 				return
 		}
 	}
-	pause
+	$host.UI.RawUI.Flushinputbuffer()
+	$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 until ($input -eq '7')
 
