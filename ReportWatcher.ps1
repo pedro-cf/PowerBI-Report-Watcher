@@ -388,9 +388,12 @@ do
 				return
 		}
 	}
-	Write-Host "Press any key to return to the menu."
 	$host.UI.RawUI.Flushinputbuffer()
-	$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+	if ($input -ne "") {
+		# $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+		Read-Host "Press ENTER to continue..."
+	}
+	
 }
 until ($input -eq '7')
 
