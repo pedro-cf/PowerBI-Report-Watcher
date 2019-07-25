@@ -282,10 +282,14 @@ function ShowAllScheduledRefreshes {
 							$refresh_count = $refresh_history.Length
 							if ($refresh_count -gt 0) {
 								$cur_refresh = $refresh_history[0]
-								if ($cur_refresh.endTime -and $cur_refresh.startTime) {
-									$refreshStart = ([DateTime]::Parse($cur_refresh.endTime))
-									$refreshEnd = ([DateTime]::Parse($cur_refresh.startTime))
-									$refreshDuration = ("{0:hh\:mm\:ss}" -f ($refreshStart - $refreshEnd))
+								if ($cur_refresh.status -eq "Completed") {
+									if ($cur_refresh.endTime -and $cur_refresh.startTime) {
+										$refreshStart = ([DateTime]::Parse($cur_refresh.endTime))
+										$refreshEnd = ([DateTime]::Parse($cur_refresh.startTime))
+										$refreshDuration = ("{0:hh\:mm\:ss}" -f ($refreshStart - $refreshEnd))
+									}
+								} else {
+									$refreshDuration = "XXXXXXXX"
 								}
 							}
 						}
