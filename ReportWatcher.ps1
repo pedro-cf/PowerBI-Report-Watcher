@@ -288,7 +288,7 @@ function ShowAllScheduledRefreshes {
 										$refreshEnd = ([DateTime]::Parse($cur_refresh.startTime))
 										$refreshDuration = ("{0:hh\:mm\:ss}" -f ($refreshStart - $refreshEnd))
 									}
-								} else {
+								} elseif ($cur_refresh.status -eq "Failed") {
 									$refreshDuration = "XXXXXXXX"
 								}
 							}
