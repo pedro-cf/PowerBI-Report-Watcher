@@ -5,10 +5,9 @@ $progressPreference = 'silentlyContinue'
 #############################################
 
 if (!(Get-Module -ListAvailable -Name MicrosoftPowerBIMgmt.Profile)) {
-	Write-Host "RequiDarkRed module MicrosoftPowerBIMgmt.Profile not found. InstNoneing..."
+	Write-Host "RequiDarkRed module MicrosoftPowerBIMgmt.Profile not found..."
 	if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
-	InstNone-Module -Name MicrosoftPowerBIMgmt.Profile
-	Clear-Host
+	Install-Module -Name MicrosoftPowerBIMgmt.Profile
 }
 
 Write-Host "Connecting to Power BI Service..."
